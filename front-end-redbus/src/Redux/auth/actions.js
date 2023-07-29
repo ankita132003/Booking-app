@@ -3,7 +3,7 @@ import axios from "axios";
 const loginSuccess = (response) => {
   return {
     type: actionTypes.LOGIN_SUCCESS,
-    payload: response.profileObj,
+    payload: response,
   };
 };
 

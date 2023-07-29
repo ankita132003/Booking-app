@@ -5,9 +5,11 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { MdAccountCircle } from "react-icons/md";
 import { Link } from "react-router-dom";
-import { GoogleLogin } from "react-google-login";
+import jwt_decode from "jwt-decode";
+// import { GoogleLogin } from "react-google-login";
+import { GoogleLogin,googleLogout, useGoogleLogin } from '@react-oauth/google';
 import { useSelector, useDispatch } from "react-redux";
-
+import axios from "axios";
 import {
   loginSuccess,
   loginFailure,
@@ -48,7 +50,6 @@ const Navbar = () => {
   const handleClose2 = () => {
     setAnchorEl2(null);
   };
-
   return (
     <div className={styles.Navbar}>
       <ComingSoonModal isOpen={isModelOpen} setIsOpen={setIsModelOpen} />
@@ -161,8 +162,8 @@ const Navbar = () => {
                   onClose={handleClose2}
                 >
                   <MenuItem onClick={handleClose2}>
-                    
-                    <GoogleLogin
+
+                    {/* <GoogleLogin
                       clientId="875288647843-hr8kb6mvovsces2plue2gtlb4ojecrg0.apps.googleusercontent.com"
                       onSuccess={(response) => {
                         console.log(
@@ -172,10 +173,44 @@ const Navbar = () => {
                         dispatch(addCustomerMongo(response.profileObj));
                       }}
                       onFailure={(response) => {
+
+                        console.log(response)
                         dispatch(loginFailure(response));
                       }}
                       cookiePolicy={"single_host_origin"}
-                    />
+                    /> */}
+                <GoogleLogin 
+                clientId="875288647843-hr8kb6mvovsces2plue2gtlb4ojecrg0.apps.googleusercontent.com"
+                onSuccess={(response) => {
+                  console.log(
+                    "---------------------------CALLED-------------------------------"
+                  );
+
+                  const userObject = jwt_decode(response.credential);
+                  const { name, email, picture, sub } = userObject;
+                  console.log(name  ,  email)
+                  // Dispatch the login success action with the extracted information
+                  dispatch(loginSuccess({
+                    name: name,
+      googleId: sub,
+      email: email,
+      profilePicture: picture,
+
+                  }));
+          
+                  // Dispatch the action to add customer data to MongoDB (if required)
+                  dispatch(addCustomerMongo({
+                    name: name,
+                    googleId: sub,
+                    email: email,
+                  }));
+                }}
+                 onError={(response) => {
+                  console.log(response)
+                  dispatch(loginFailure(response));
+                }}
+                cookiePolicy={"single_host_origin"}
+                  />
                   </MenuItem>
                 </Menu>
               )}

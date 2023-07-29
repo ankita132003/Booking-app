@@ -9,9 +9,11 @@ const initState = {
 const authReducer = (state = initState, action) => {
   switch (action.type) {
     case actionTypes.LOGIN_SUCCESS:
+      console.log(action.payload)
       return {
         ...state,
         isLoggedIn: true,
+        
         currentCustomer: {
           name: action.payload.name,
           googleId: action.payload.googleId,
